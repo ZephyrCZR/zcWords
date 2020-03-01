@@ -2,7 +2,12 @@ const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
 
-const userInfo = require('./routers/userInfo')
+// 数据库：
+const connect = require('./connect')
+
+
+// 路由：
+// const userInfo = require('./routers/userInfo')
 
 const app = express()
 
