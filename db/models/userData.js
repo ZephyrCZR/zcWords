@@ -6,23 +6,21 @@ const bookSchema = new Schema({
     type: String,
     required: true
   },
-  createDate: {
-    type: Date,
-    default: Date.now
-  },
-  nextDate: {
-    type: Date,
-    default: Date.now
-  },
-  reviewTimes: {
-    type: Number,
-    default: -1
-  },
   state: {
     type: Number,
     default: 0
     //0: 未背； 1：已背； 2：已掌握
-  }
+  },
+  reviewTimes: {
+    type: Number,
+    default: -1
+  }, 
+  firstDate: {
+    type: Date
+  },
+  nextDate: {
+    type: Date
+  },
 
 })
 
@@ -35,6 +33,10 @@ const dataSchema = new Schema({
     type: String,
     require: true,
     default: "common"
+  },
+  createDate: {
+    type: Date,
+    default: Date.now
   },
   book: [bookSchema]
 
