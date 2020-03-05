@@ -8,6 +8,7 @@ const connect = require('./db/connect')
 
 // 路由：
 const word = require('./routers/word')
+const member = require('./routers/member')
 
 const app = express()
 
@@ -31,7 +32,9 @@ app.use('/node_modules', express.static(path.join(__dirname, './node_modules/'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+// 挂载路由
 app.use(word)
+app.use(member)
 
 app.listen(5000, () => {
   console.log('running>> http://127.0.0.1:5000')

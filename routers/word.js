@@ -1,5 +1,5 @@
 const express = require('express')
-const db = require('../db/utils')
+const db = require('../db/word_helper')
 const router = express.Router()
 
 //初始化用户词书
