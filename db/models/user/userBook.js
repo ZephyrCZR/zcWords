@@ -25,10 +25,6 @@ const bookSchema = new Schema({
 })
 
 const dataSchema = new Schema({
-  userId: {
-    type: String,
-    required: true
-  },
   bookName: {
     type: String,
     require: true,
@@ -39,7 +35,6 @@ const dataSchema = new Schema({
     default: Date.now
   },
   book: [bookSchema]
-
 })
 
 

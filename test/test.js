@@ -1,12 +1,12 @@
-const LibModle = require('../db/models/wordLib')
-const DataModle = require('../db/models/userData')
-const BookModle = require('../db/models/book')
+const LibModle = require('../db/models/server/wordLib')
+const DataModle = require('../db/models/user/userBook')
+const BookModle = require('../db/models/server/book')
 
 // const tool = require('./tools')
 
 
 
-// const connect = require('../db/connect')
+const connect = require('../db/connect')
 
 
 

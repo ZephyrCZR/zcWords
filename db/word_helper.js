@@ -1,22 +1,139 @@
-const LibModle = require('./models/server/wordLib')
-const DataModle = require('./models/user/userBook')
-const BookModle = require('./models/server/book')
-// const connect = require('./connect')
+const Lib = require('./models/server/wordLib')
+const UserBook = require('./models/user/userBook')
+const User = require('../db/models/user/user')
+const Book = require('./models/server/book')
+const connect = require('./connect')
 
-
-/**获取指定用户的词书信息
+/**添加用户词书
  * 
- * @param {用户id} userId 
+ * @param {用户Id} user_id 
  * @param {词书名称} bookName 
  */
-const getUserBook = (userId, bookName) => {
+const addUserBook = (user_id, bookName) => {
   return new Promise((resolve, reject) => {
-    DataModle.findOne({
-      $and: [{
-        "userId": userId
-      }, {
-        "bookName": bookName
-      }]
+    getUserBook(user_id).then((book) => {
+      return checkUserBook(book.bookList, bookName)
+    }).then((flag) => {
+      if (flag) {
+        reject("词书已存在")
+      } else {
+        return createBook(bookName)
+      }
+    }).then((book_id) => {
+      //添加到用户信息表
+      if (book_id) {
+        return addBookToUser(user_id, book_id)
+      }      
+     
+      
+    }).then(() => {
+      resolve("添加词书成功")
+    })
+  })
+}
+
+//获取指定用户所拥有的词书信息
+const getUserBook = (userId) => {
+  return new Promise((resolve, reject) => {
+    User.findOne({
+      "_id": userId
+    }).select("bookList").exec((err, doc) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(doc)
+      }
+    })
+  })
+}
+
+//检验是否已拥有该词书
+const checkUserBook = function (list, bookName) {
+  return new Promise((resolve, reject) => {
+    if (list.length === 0) {
+      resolve(false)
+    }
+
+    let round = 0
+
+    list.forEach((id) => {
+      UserBook.findOne({
+        _id: id
+      }).select("bookName").exec((err, doc) => {
+        if (err) {
+          console.log("服务器发生错误");
+        } else if (doc && doc.bookName === bookName) {
+          resolve(true)
+        } else {
+          round++
+          if (round === list.length) {
+            resolve(false)
+          }
+        }
+      })
+    })
+  })
+}
+
+//创建新的用户词书
+const createBook = (bookName) => {
+  return new Promise((resolve, reject) => {
+    findBook(bookName).then(
+      (wordsIdArr) => {
+        let idArr = []
+        wordsIdArr.wordsId.forEach(el => {
+          idArr.push({
+            wordId: el
+          })
+        })
+        UserBook.create({
+          bookName: bookName,
+          book: idArr
+        }, (err, doc) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(doc._id)
+          }
+        })
+      }, (err) => {
+        reject(err)
+      }
+    )
+  })
+}
+
+//查找服务端的词书列表
+const findBook = (bookName) => {
+  return new Promise((resolve, reject) => {
+    Book.findOne({
+      bookName: bookName
+    }).select("wordsId").exec((err, wordsIdArr) => {
+      if (err) {
+        reject(err)
+      } else {
+        if (wordsIdArr) {
+          resolve(wordsIdArr)
+        } else {
+          reject("该词书不存在")
+        }
+
+      }
+    })
+  })
+}
+
+//添加词书到用户表
+const addBookToUser = (user_id, book_id) => {
+  return new Promise((resolve, reject) => {
+    User.updateOne({
+      _id: user_id
+    }, {
+      $addToSet: {
+        bookList: [
+          book_id
+        ]
+      }
     }, (err, doc) => {
       if (err) {
         reject(err)
@@ -28,53 +145,10 @@ const getUserBook = (userId, bookName) => {
 }
 
 
-// getUserBook("102", "book4").then((res) => {
-//   console.log(res);
-// },(err) => {
-//   console.log(err);
-// })
+// addUserBook("5e6221bb3cacfe2f9c9bab86", "common2000").then((suc) => {
+//   console.log(suc);
+// }, (err) => console.log(err))
 
-/** 初始化用户词书
- * 
- * @param {用户Id} userId 
- * @param {词书名称} bookName 
- */
-const initUserBook = (userId, bookName) => {
-  return new Promise((resolve, reject) => {
-    getUserBook(userId, bookName).then(
-      (res) => {
-        if (res) {
-          let errMessage = "For user id: " + userId + ", book \"" + bookName + "\" is already exist"
-          // console.log(errMessage);
-          reject(errMessage)
-        } else {
-          BookModle.findOne({
-            bookName: bookName
-          }).select("wordsId").exec((err, wordsIdArr) => {
-            if (err) {
-              throw err
-            } else {
-              // console.log(wordsIdArr);
-              let idArr = []
-              wordsIdArr.wordsId.forEach(el => {
-                idArr.push({
-                  wordId: el
-                })
-              })
-              DataModle.create({
-                userId: userId,
-                bookName: bookName,
-                book: idArr
-              })
-              // console.log("Initialization is complete");
-              resolve("Initialization is complete")
-            }
-          })
-        }
-      })
-  })
-  }
-// initUserBook("111", "common2000")
 
 
 
@@ -84,7 +158,7 @@ const initUserBook = (userId, bookName) => {
  * @param {单词} word 
  */
 const findWord = function (word, fun) {
-  LibModle.findOne({
+  Lib.findOne({
     "word": word
   }, (err, doc) => {
     if (err) {
@@ -99,7 +173,7 @@ const findWord = function (word, fun) {
  * @param {单词Id} wordId 
  */
 const findWordById = function (wordId, fun) {
-  LibModle.findOne({
+  Lib.findOne({
     "_id": wordId
   }, (err, doc) => {
     if (err) {
@@ -122,7 +196,7 @@ const findWordById = function (wordId, fun) {
  */
 const getReviews = function (userId, bookName, fun) {
   let now = new Date()
-  DataModle.aggregate([{
+  UserBook.aggregate([{
       "$unwind": "$book"
     },
     {
@@ -179,7 +253,7 @@ const getReviews = function (userId, bookName, fun) {
  * @param {回调函数} fun 
  */
 const getState = function (userId, bookName, state, fun) {
-  DataModle.aggregate([{
+  UserBook.aggregate([{
       "$unwind": "$book"
     },
     {
@@ -225,7 +299,7 @@ const getState = function (userId, bookName, state, fun) {
 // })
 
 const setState = function (id, wordId, state) {
-  DataModle.update({
+  UserBook.update({
     "_id": id,
     "book.wordId": wordId
   }, {
@@ -265,7 +339,7 @@ const getWordsArrByIdArr = function (wordsIdArr, fun) {
  */
 // const getReviewWords = function (amount) {
 //   let now = new Date()
-//   DataModle.find({nextDate:{ $lt: now }},function (err, docs) {
+//   UserBook.find({nextDate:{ $lt: now }},function (err, docs) {
 //     if (err) {
 //       throw err
 //     }else return docs
@@ -275,5 +349,6 @@ const getWordsArrByIdArr = function (wordsIdArr, fun) {
 
 
 module.exports = {
-  getUserBook,initUserBook
+  addUserBook,
+
 }
