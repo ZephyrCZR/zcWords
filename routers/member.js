@@ -50,7 +50,6 @@ router.get('/login',  (req, res) => {
 
   const body = req.query
   // const body = req.body
-  console.log(body)
 
   helper.localLogin(body).then((user) => {
     // 注意默认情况 Token 必须以 Bearer+空格 开头

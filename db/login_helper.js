@@ -10,9 +10,14 @@ const Users = require('./models/user/user')
 const AuthRel = require('../db/models/login/userAuthRel')
 const LocalAuth = require('../db/models/login/userLocalAuth')
 // const ThirdAuth = require('../db/models/login/userThirdAuth')
-const tools = require('../common/utils')
+// const tools = require('../common/utils')
+const sha256 = require('sha256')
 
 // require('./connect')
+
+const encrypt = function (data) {  
+  return sha256(data + "Zephyr")
+}
 
 /**验证该用户名是否已经存在
  * 
@@ -104,7 +109,7 @@ const checkLocalRegInfo = async function (user_name, phone) {
  */
 const localReg = function (options) {
   return new Promise((resolve, reject) => {
-    options.password = tools.encrypt(options.password)
+    options.password = encrypt(options.password)
     LocalAuth.create(options, (err, doc) => {
       if (err) {
         reject(err)
@@ -245,7 +250,7 @@ const localLogin = function (body) {
       reject("无填写账号")
     }
     if (body.password) {
-      password = tools.encrypt(body.password)
+      password = encrypt(body.password)
     } else {
       reject("无填写密码")
     }

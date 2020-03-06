@@ -1,1 +1,1 @@
-console.log(Date.now());
+const fs = require('fs')
