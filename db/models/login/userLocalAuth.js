@@ -15,7 +15,12 @@ const userLocalAuth = new Schema({
   phone: {
     type: String,
     required: true
-  }  
+  },
+  try_times: {
+    type: Number,
+    default: 0,
+    required: true
+  },
 })
 
 module.exports = mongoose.model('user_local_auths', userLocalAuth)

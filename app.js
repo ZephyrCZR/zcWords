@@ -1,16 +1,31 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
-
+const expressJWT = require('express-jwt');
+const app = express()
 // 数据库：
 const connect = require('./db/connect')
-
 
 // 路由：
 const word = require('./routers/word')
 const member = require('./routers/member')
 
-const app = express()
+// jwt：
+const secretOrPrivateKey = "Zephyr"  //加密token 校验token时要使用
+app.use(expressJWT({
+    secret: secretOrPrivateKey   
+}).unless({
+    path: ['/login','/register']  //除了这个地址，其他的URL都需要验证
+}))
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {   
+      //  这个需要根据自己的业务逻辑来处理（ 具体的err值 请看下面）
+    res.status(401).send('invalid token...');
+  }
+});
+
+
+
 
 // //设置允许跨域访问该服务.
 // app.all('*', function (req, res, next) {

@@ -1,9 +1,19 @@
-const Users = require('../db/models/login/users')
+/**
+ * 操作登录相关信息
+ * 提供了以下方法：
+ * checkLocalRegInfo： 检查本地授权集合中是否已存在对应手机号码和用户名
+ * localReg：将信息写入本地授权
+ * finishReg： 完成注册，生成授权关联表和创建用户信息
+ * localLogin： 本地登录
+ */
+const Users = require('./models/user/user')
 const AuthRel = require('../db/models/login/userAuthRel')
 const LocalAuth = require('../db/models/login/userLocalAuth')
-const ThirdAuth = require('../db/models/login/userThirdAuth')
+// const ThirdAuth = require('../db/models/login/userThirdAuth')
 const tools = require('../common/utils')
-// const connect = require('./connect')
+
+// require('./connect')
+
 /**验证该用户名是否已经存在
  * 
  * @param {用户名} user_name 
@@ -21,6 +31,7 @@ const findLocalUN = (user_name) => {
     })
   })
 }
+
 /**验证该手机号是否已经注册
  * 
  * @param {手机号} phone 
@@ -38,6 +49,7 @@ const findLocalUPhone = (phone) => {
     })
   })
 }
+
 /** 验证用户名和手机号是否已经存在
  * 
  * @param {用户名}} user_name 
@@ -60,28 +72,31 @@ const checkLocalRegInfo = async function (user_name, phone) {
     sign = -1
   })
 
+  let message = {}
+  message.code = 200
   switch (sign) {
     case 0:
       return false
       break;
     case 1:
-      return "该用户名已被占用"
+      message.msg = "该用户名已被占用"
+      return message
       break;
     case 2:
-      return "该手机号码已经注册"
+      message.msg = "该手机号码已经注册"
+      return message
       break;
     case 3:
-      return "该手机号码已经注册"
+      message.msg = "该手机号码已经注册"
+      return message
       break;
     default:
-      return "服务器发生错误"
+      message.code = 500
+      message.msg = "服务器发生错误"
+      return message
       break;
   }
 }
-// console.log(object);
-// checkLocalRegInfo("ha1ha", "17875300024").then((res) => {
-//   console.log(res);
-// })
 
 /**本地注册
  * 
@@ -90,7 +105,7 @@ const checkLocalRegInfo = async function (user_name, phone) {
 const localReg = function (options) {
   return new Promise((resolve, reject) => {
     options.password = tools.encrypt(options.password)
-    LocalAuth.create(options, (err,doc) => {
+    LocalAuth.create(options, (err, doc) => {
       if (err) {
         reject(err)
       } else {
@@ -100,28 +115,15 @@ const localReg = function (options) {
   })
 }
 
-
-// localReg({
-//   user_name: "大傻逼",
-//   password: "abcdefg",
-//   phone: "17875300000"
-// }).then(() => {
-//   console.log("成功");
-// }, () => {
-//   console.log("失败");
-// })
-
 /**初始化用户表
  * 
- * @param {用来生成token的id，使用local、third登录表的_id} id 
+ * @param {用户昵称} nickname 
  */
-const initUser = function (id) {
+const initUser = function (nickname) {
   return new Promise((resolve, reject) => {
-    const date = tools.lateDays(Date.now(), 7)
-    const token = tools.getToken(id)
+
     Users.create({
-      token: token,
-      expire_in: date
+      "nickname": nickname
     }, (err, doc) => {
       if (err) {
         reject(err)
@@ -132,37 +134,176 @@ const initUser = function (id) {
   })
 }
 
-// initUser("lksjdflkjdfo3i23").then((res)=>{
-//   console.log(res);
-// },(err)=>{
-//   console.log(err);
-// })
-
-
-const finishReg = function (auth_id, auth_type) {
-  return new Promise((resolve,reject) => {
-    initUser(auth_id).then((res) => {
-      AuthRel.create({
-        user_id: res._id,
-        auth_id: auth_id,
-        auth_type: auth_type
-      },(err,doc) => {
-        if (err) {
-          Users.remove({
-            _id: res._id
-          })
-          reject(err)
-        }else{
-          resolve(doc)
-        }
-      })
+/**从一个集合中删除一个文档
+ * 
+ * @param {集合名} Collection 
+ * @param {查询对象} query 
+ */
+const deleteADoc = function (Collection, query) {
+  return new Promise((resolve, reject) => {
+    Collection.deleteOne(query, (removeErr, removeDoc) => {
+      if (removeErr) {
+        reject("删除失败")
+      } else {
+        resolve(removeDoc)
+      }
     })
-   
+  })
+
+}
+
+
+/**完成注册后续动作
+ * 
+ * @param { 授权Id，包括本地授权和第三方授权 } auth_id 
+ * @param { 授权类型，包括 local 和 third } auth_type 
+ */
+const finishReg = function (local, auth_type) {
+  return new Promise((resolve, reject) => {
+    initUser(local.user_name).then(
+
+      (res) => {
+        AuthRel.create({
+            user_id: res._id,
+            auth_id: local._id,
+            auth_type: auth_type
+          },
+          (err, doc) => {
+            if (err) {
+              deleteADoc(LocalAuth, {
+                _id: local._id
+              }).then((suc) => {
+                return deleteADoc(Users, {
+                  _id: res._id
+                })
+              }, (err) => {
+                // user表、local表回退失败
+                reject("服务器发生了严重错误---all")
+              }).then((suc) => {
+                // user表、local表回退成功
+                reject("服务器发生了错误")
+              }, (err) => {
+                // user表回退失败
+                reject("服务器发生了严重错误---user")
+              })
+
+            } else {
+              resolve(local)
+            }
+          })
+      }, (err) => {
+        deleteADoc(LocalAuth, {
+          _id: local._id
+        }).then(() => {
+          reject("服务器发生了错误")
+        }, () => {
+          reject("服务器发生了严重错误---local")
+        })
+      }
+    )
   })
 }
+
+/**检查关联的用户ID
+ * 
+ * @param {授权Id} auth_id 
+ * @param {授权类型} auth_type 
+ */
+const checkAuthRel = function (auth_id, auth_type) {
+  return new Promise((resolve, reject) => {
+    AuthRel.findOne({
+      auth_id: auth_id,
+      auth_type: auth_type
+    }, (err, doc) => {
+      if (err) {
+        reject(err)
+      } else {
+        let obj = {}
+        obj.user_id = doc.user_id
+        obj.permission = doc.permission
+        resolve(obj)
+      }
+    })
+  })
+}
+
+/**本地登录
+ * 
+ * @param {用户登录数据} body 
+ * 异步返回用户id: user_id
+ */
+const localLogin = function (body) {
+  return new Promise((resolve, reject) => {
+    let query = {}
+    let password
+
+    if (body.user_name) {
+      query.user_name = body.user_name
+    } else if (body.phone) {
+      query.phone = body.phone
+    } else {
+      reject("无填写账号")
+    }
+    if (body.password) {
+      password = tools.encrypt(body.password)
+    } else {
+      reject("无填写密码")
+    }
+
+    LocalAuth.findOne(query, (err, doc) => {
+      if (err) {
+        reject('服务器错误')
+      } else {
+        if (doc) {
+          //校验密码是否正确
+          if (doc.password === password) {
+            //如果登录成功并且 try_times 不为 0，重置try_times
+            if (doc.try_times !== 0) {
+              setLocalAuth(query, {
+                "try_times": 0
+              })
+            }
+            checkAuthRel(doc._id, "local").then(user_id => resolve(user_id), err => reject('服务器错误'))
+          } else {
+            //如果登录失败，try_times + 1
+            setLocalAuth(query, {
+              "try_times": doc.try_times + 1
+            })
+            reject('账号或密码错误') //密码错误
+          }
+        } else {
+          reject('账号或密码错误') //账号错误
+        }
+      }
+    })
+  })
+}
+
+/**操作本地授权用户表
+ * 如：修改密码，修改绑定手机，修改登录错误次数
+ * @param {查询目标} query 
+ * @param {目标结果} target 
+ */
+const setLocalAuth = function (query, target) {
+  return new Promise((resolve, reject) => {
+    LocalAuth.updateOne(query, {
+        $set: target
+      },
+      (err, res) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(res)
+        }
+      }
+    )
+  })
+}
+
 
 module.exports = {
   checkLocalRegInfo,
   localReg,
-  finishReg
+  finishReg,
+  localLogin
 }
