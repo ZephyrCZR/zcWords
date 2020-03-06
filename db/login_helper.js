@@ -300,10 +300,25 @@ const setLocalAuth = function (query, target) {
   })
 }
 
+/**更新最后一次登录时间
+ * 
+ * @param {用户id} user_id 
+ */
+const newLogTime = function (user_id) {
+  // const time = Date.now()
+  Users.updateOne(
+    {_id: user_id}, {
+      $set: {
+        last_login_time: Date.now()
+      }
+    },() => {}
+  )  
+}
 
 module.exports = {
   checkLocalRegInfo,
   localReg,
   finishReg,
-  localLogin
+  localLogin,
+  newLogTime
 }

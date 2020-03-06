@@ -60,6 +60,8 @@ router.get('/login',  (req, res) => {
     }, SECRET, {
       expiresIn: 3600 * 24 * 7
     })
+
+    helper.newLogTime(user.user_id)
     res.status(200).json({
       message: '登录成功',
       data: {

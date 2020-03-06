@@ -21,3 +21,9 @@ const setUsers = function (query, target) {
     )
   })
 }
+
+
+
+module.exports = {
+  setUsers
+}
