@@ -1,5 +1,5 @@
 const express = require('express')
-const helper = require('../db/login_helper')
+const db = require('../db/login_helper')
 const jwt = require('jsonwebtoken')
 
 const router = express.Router()
@@ -18,7 +18,7 @@ router.get('/register', (req, res) => {
   // const body = req.body
 
   // err_code: 0:注册成功；  200：注册失败，用户名或手机号已经存在；  500： 服务器错误
-  helper.checkLocalRegInfo(body.user_name, body.phone).then(err => {
+  db.checkLocalRegInfo(body.user_name, body.phone).then(err => {
     if (err) {
       res.status(err.code).json({
         err_code: err.code,
@@ -51,7 +51,7 @@ router.get('/login',  (req, res) => {
   const body = req.query
   // const body = req.body
 
-  helper.localLogin(body).then((user) => {
+  db.localLogin(body).then((user) => {
     // 注意默认情况 Token 必须以 Bearer+空格 开头
     const token = 'Bearer ' + jwt.sign({
       _id: user.user_id,
@@ -60,7 +60,7 @@ router.get('/login',  (req, res) => {
       expiresIn: 3600 * 24 * 7
     })
 
-    helper.newLogTime(user.user_id)
+    db.newLogTime(user.user_id)
     res.status(200).json({
       message: '登录成功',
       data: {

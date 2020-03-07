@@ -10,15 +10,15 @@ const usersSchema = new Schema({
     type: String,
     default: '/public/img/avatar-default.png'
   },
-  starCoin: {
+  star_coin: {
     type: Number,
     default: 10,
     required: true
   },
-  bookId: {
+  book_id: {
     type: String
   },
-  bookList: {
+  book_list: {
     type: Array,
     default: [] //bookId, bookName, createDate, wordsCount
   },  

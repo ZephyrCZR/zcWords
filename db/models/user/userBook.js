@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const bookSchema = new Schema({
-  wordId: {
+  word_id: {
     type: String,
     required: true
   },
@@ -11,26 +11,26 @@ const bookSchema = new Schema({
     default: 0
     //0: 未背； 1：已背； 2：已掌握
   },
-  reviewTimes: {
+  review_times: {
     type: Number,
     default: -1
   }, 
-  firstDate: {
+  first_date: {
     type: Date
   },
-  nextDate: {
+  next_date: {
     type: Date
   },
 
 })
 
 const dataSchema = new Schema({
-  bookName: {
+  book_name: {
     type: String,
     require: true,
     default: "common"
   },
-  createDate: {
+  create_date: {
     type: Date,
     default: Date.now
   },
@@ -38,4 +38,4 @@ const dataSchema = new Schema({
 })
 
 
-module.exports = mongoose.model('UserData', dataSchema)
+module.exports = mongoose.model('UserBooks', dataSchema)
