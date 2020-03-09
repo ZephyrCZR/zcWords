@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const usersSchema = new Schema({
   nickname: {
     type: String,
-    required: true
+    default: 'MEOW用户'
   },
   avatar: {
     type: String,

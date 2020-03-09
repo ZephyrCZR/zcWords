@@ -6,7 +6,7 @@ const userLocalAuth = new Schema({
 
   user_name: {
     type: String,
-    required: true
+    default: 'MEOW用户'
   },
   password: {
     type: String,

@@ -2,7 +2,7 @@ const Lib = require('./models/server/wordLib')
 const UserBook = require('./models/user/userBook')
 const User = require('../db/models/user/user')
 const Book = require('./models/server/book')
-const connect = require('./connect')
+// const connect = require('./connect')
 const ObjectId = require('objectid')
 
 /**添加用户词书
@@ -14,7 +14,7 @@ const addUserBook = (user_id, book_name) => {
   return new Promise((resolve, reject) => {
     getUserBookList(user_id).then((book) => {
 
-      return checkUserBook(book.bookList, book_name)
+      return checkUserBook(book.book_list, book_name)
 
     }, (err) => {
 
@@ -23,7 +23,7 @@ const addUserBook = (user_id, book_name) => {
     }).then((flag) => {
 
       if (flag) {
-        reject("词书已存在")
+        reject("你已经有这本书了")
       } else {
         return createBook(book_name)
       }
@@ -116,14 +116,14 @@ const findBook = (book_name) => {
   return new Promise((resolve, reject) => {
     Book.findOne({
       book_name: book_name
-    }).select("wordsId").exec((err, wordsIdArr) => {
+    }).select("words_id").exec((err, wordsIdArr) => {
       if (err) {
         reject(err)
       } else {
         if (wordsIdArr) {
           resolve(wordsIdArr)
         } else {
-          reject("该词书不存在")
+          reject("该词书未收录")
         }
 
       }
@@ -150,9 +150,9 @@ const addBookToUser = (user_id, book_id) => {
   })
 }
 
-addUserBook("5e621d2e89838933ac5c039", "common2000").then((suc) => {
-  console.log(suc);
-}, (err) => console.log(err))
+// addUserBook("5e622466a22b335b48240b13", "common2000").then((suc) => {
+//   console.log(suc);
+// }, (err) => console.log(err))
 
 
 
@@ -236,9 +236,11 @@ const setState = function (book_id, word_id, state) {
 //同步单词状态表
 const syncUsersBook = function (book_id, wordsArr) {
   return new Promise((resolve) => {
+    const time = Data.now()
     UserBook.findByIdAndUpdate(book_id, {
       $set: {
-        book: wordsArr
+        book: wordsArr,
+        version: time
       }
     }).exec((err, doc) => {
       if (err) {
@@ -250,14 +252,14 @@ const syncUsersBook = function (book_id, wordsArr) {
   })
 }
 
-//获取指定词书的单词状态列表
-const getWordsStateList = function (book_id) {
+//获取指定词书
+const getUsersBookByBId = function (book_id) {
   return new Promise((resolve, reject) => {
     UserBook.findById(book_id).exec((err, doc) => {
       if (err) {
         reject(err)
       } else {
-        resolve(doc.book)
+        resolve(doc)
       }
     })
   })

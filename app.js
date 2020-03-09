@@ -1,5 +1,6 @@
 const express = require('express')
 const path = require('path')
+// const session = require('express-session')
 const bodyParser = require('body-parser')
 const expressJWT = require('express-jwt');
 const app = express()
@@ -15,7 +16,7 @@ const secretOrPrivateKey = "Zephyr"  //加密token 校验token时要使用
 app.use(expressJWT({
     secret: secretOrPrivateKey   
 }).unless({
-    path: ['/login','/register']  //除了这个地址，其他的URL都需要验证
+    path: ['/zrizc/register','/zrizc/login','/zrizc/getmsg','/zrizc/resetpassword']  //除了这些地址，其他的URL都需要验证
 }))
 app.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {   
@@ -25,17 +26,31 @@ app.use(function (err, req, res, next) {
 })
 
 
+//设置允许跨域访问该服务.
+app.all('*', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  //Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Content-Type', 'application/json;charset=utf-8');
+  // res.header('Access-Control-Allow-Credentials','true');
+  next();
+});
 
+// app.use(session({
+//   secret: 'Zephyrhaha',
+//   resave: false,
+//   saveUninitialized: true,
+//   // rolling:true,
+//   cookie: ('name', 'value',
+//     { 
+//       maxAge:  5*1000*30,
+//       secure: false,
+//       name: "seName",    
+//       resave: false
+//     })
+// }))
 
-// //设置允许跨域访问该服务.
-// app.all('*', function (req, res, next) {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   //Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
-//   res.header('Access-Control-Allow-Headers', 'Content-Type');
-//   res.header('Access-Control-Allow-Methods', '*');
-//   res.header('Content-Type', 'application/json;charset=utf-8');
-//   next();
-// });
 
 app.use('/public/', express.static(path.join(__dirname,'./public/'))) //path.join:拼接路径，并且处理斜杠
 app.use('/node_modules', express.static(path.join(__dirname, './node_modules/')))
@@ -51,6 +66,6 @@ app.use(bodyParser.json())
 app.use(word)
 app.use(member)
 
-app.listen(5000, () => {
-  console.log('running>> http://127.0.0.1:5000')
+app.listen(5230, () => {
+  console.log('running>> http://127.0.0.1:5230')
 })

@@ -13,9 +13,9 @@ const LocalAuth = require('../db/models/login/userLocalAuth')
 // const tools = require('../common/utils')
 const sha256 = require('sha256')
 
-// require('./connect')
+require('./connect')
 
-const encrypt = function (data) {  
+const encrypt = function (data) {
   return sha256(data + "Zephyr")
 }
 
@@ -47,7 +47,7 @@ const findLocalUPhone = (phone) => {
       phone: phone
     }, (err, doc) => {
       if (err) {
-        reject(err)
+        reject()
       } else {
         resolve(doc)
       }
@@ -82,24 +82,19 @@ const checkLocalRegInfo = async function (user_name, phone) {
   switch (sign) {
     case 0:
       return false
-      break;
     case 1:
       message.msg = "该用户名已被占用"
       return message
-      break;
     case 2:
       message.msg = "该手机号码已经注册"
       return message
-      break;
     case 3:
       message.msg = "该手机号码已经注册"
       return message
-      break;
     default:
       message.code = 500
       message.msg = "服务器发生错误"
       return message
-      break;
   }
 }
 
@@ -284,6 +279,25 @@ const localLogin = function (body) {
   })
 }
 
+/**根据手机号码获取id
+ * 
+ * @param {手机号} phone 
+ */
+const getUserIdByPhone = function (phone) {
+  return new Promise((resolve, reject) => {
+    LocalAuth.findOne({
+      phone: phone
+    }).exec((err,doc) => {
+      console.log(doc);
+      if (err) {
+        reject(err)
+      }
+      checkAuthRel(doc._id, "local").then(res => resolve(res.user_id), err => reject('服务器错误'))
+    })
+  })
+}
+
+
 /**操作本地授权用户表
  * 如：修改密码，修改绑定手机，修改登录错误次数
  * @param {查询目标} query 
@@ -311,13 +325,13 @@ const setLocalAuth = function (query, target) {
  */
 const newLogTime = function (user_id) {
   // const time = Date.now()
-  Users.updateOne(
-    {_id: user_id}, {
-      $set: {
-        last_login_time: Date.now()
-      }
-    },() => {}
-  )  
+  Users.updateOne({
+    _id: user_id
+  }, {
+    $set: {
+      last_login_time: Date.now()
+    }
+  }, () => {})
 }
 
 module.exports = {
@@ -325,5 +339,7 @@ module.exports = {
   localReg,
   finishReg,
   localLogin,
-  newLogTime
+  newLogTime,
+  findLocalUPhone,
+  getUserIdByPhone
 }

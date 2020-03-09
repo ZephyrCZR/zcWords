@@ -49,3 +49,57 @@ const connect = require('../db/connect')
 //   },
 // ]
 // })
+
+
+{
+  data: [
+    {
+      Location: "tian1",
+      info:[
+        {
+          DTU: "51",
+          type: "LORADTU",
+          HEX: "33"
+        },
+        {
+          DTU: "51",
+          type: "水位计",
+          HEX: "8C"
+        }
+      ]
+    },
+    {
+      Location: "tian2",
+      info:[
+        {
+          DTU: "51",
+          type: "LORADTU",
+          HEX: "33"
+        }
+      ]
+    }
+  ]
+}
+
+// const parentSchema = new Schema({
+//   location: {
+//     type: String,
+//     required: true
+//   },
+//   info: [childSchema]
+// })
+
+// const childSchema = new Schema({
+//   dtu: {
+//     type: String,
+//     required: true
+//   },
+//   type: {
+//     type: String,
+//     required: true
+//   },
+//   hex:{
+//     type: String,
+//     required: true
+//   }
+// })

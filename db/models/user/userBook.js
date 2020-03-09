@@ -34,6 +34,10 @@ const dataSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  version: {
+    type: Date,
+    default: Date.now
+  },
   book: [bookSchema]
 })
 
