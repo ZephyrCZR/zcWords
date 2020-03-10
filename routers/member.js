@@ -9,15 +9,12 @@ const SECRET = 'Zephyr'
 
 const tempStorage = new Map()
 
-
 /**
  * 获取短信验证码
  */
-
 router.post('/zrizc/getmsg', (req, res) => {
   const body = req.body
   console.log(body);
-
 
   db.findLocalUPhone(body.phone).then((doc) => {
     console.log(doc);
@@ -40,17 +37,17 @@ router.post('/zrizc/getmsg', (req, res) => {
         token: tempToken
       })
 
+      //清理map结构缓存
       if (tempStorage.size > 100) {
         tempStorage.forEach((el) => {
           if (time - el.createTime > 5 * 60 * 1000) {
             tempStorage.remove(el)
           }
-
         })
       }
       console.log(tempStorage);
       res.status(200).json({
-        data: tempToken,
+        temptoken: tempToken,
         err_code: 0,
         message: '短信已发送'
       })
@@ -63,11 +60,13 @@ router.post('/zrizc/getmsg', (req, res) => {
 })
 
 
+ // err_code: 0:注册/登录成功；  1：注册/登录失败，用户名或手机号已经存在/账号密码错误； 401：短信验证码错误  500： 服务器错误
+
 /**
  * 本地用户注册
  */
 router.post('/zrizc/register', (req, res) => {
-  // err_code: 0:注册成功；  1：注册失败，用户名或手机号已经存在； 2.短信验证码错误  500： 服务器错误
+ 
   const body = req.body
 
   if (!utils.matchMobile(body.phone)) {
@@ -86,7 +85,7 @@ router.post('/zrizc/register', (req, res) => {
 
     res.status(401).json({
       err_code: 401,
-      message: '拒绝访问'
+      message: '验证码错误'
     })
     return
   }
@@ -95,18 +94,15 @@ router.post('/zrizc/register', (req, res) => {
 
   // 如果没有token,或者用户号码不匹配
   if (sha256(tokenInfo[0]) !== tokenInfo[1] || JSON.parse(tokenInfo[0]).phone !== body.phone) {
-    console.log('测试2');
     res.status(401).json({
       err_code: 401,
-      message: '拒绝访问'
+      message: '验证码错误'
     })
     return
-
   }
 
   // 如果token过期
   if (tokenInfo[0].deadline < Date.now()) {
-
     res.status(401).json({
       err_code: 401,
       message: '验证码已超时'
@@ -140,9 +136,7 @@ router.post('/zrizc/register', (req, res) => {
             res.status(200).json({
               err_code: 0,
               message: '注册成功',
-              data: {
-                token: token
-              }
+              token: token
             })
           })
 
@@ -157,8 +151,8 @@ router.post('/zrizc/register', (req, res) => {
     })
 
   } else {
-    res.status(200).json({
-      err_code: 2,
+    res.status(401).json({
+      err_code: 401,
       message: '验证码错误'
     })
   }
@@ -169,10 +163,10 @@ router.post('/zrizc/register', (req, res) => {
 /** 
  * 本地用户登录
  */
-router.get('/zrizc/login', (req, res) => {
+router.post('/zrizc/login', (req, res) => {
 
-  const body = req.query
-  // const body = req.body
+  const body = req.body
+
   db.localLogin(body).then((user) => {
     // 注意默认情况 Token 必须以 Bearer+空格 开头
     const token = 'Bearer ' + jwt.sign({
@@ -185,12 +179,12 @@ router.get('/zrizc/login', (req, res) => {
     db.newLogTime(user.user_id)
     res.status(200).json({
       message: '登录成功',
-      data: {
-        token: token
-      }
+      err_code: 0,
+      token: token
     })
   }, (err) => {
     res.status(200).json({
+      err_code: 1,
       message: err
     })
   })
