@@ -14,7 +14,12 @@ const userAuthRel = new Schema({
   auth_type: {
     type: String,
     required: true
-  }  
+  },
+  permission: {
+    type: Number,
+    default: 1,
+    required: true
+  }
 })
 
 module.exports = mongoose.model('user_auths_rel', userAuthRel)

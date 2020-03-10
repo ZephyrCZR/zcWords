@@ -26,11 +26,6 @@ const usersSchema = new Schema({
     type: Number,
     default: 0
   }, 
-  permission: {
-    type: Number,
-    default: 1,
-    required: true
-  },
   last_login_time: {
     type: Date,
     default: Date.now
