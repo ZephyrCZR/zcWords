@@ -4,10 +4,11 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const expressJWT = require('express-jwt');
 const app = express()
-// 数据库：
-const connect = require('./db/connect')
 
-// 路由：
+// 连接数据库：
+require('./db/connect')
+
+// 注册路由：
 const word = require('./routers/word')
 const member = require('./routers/member')
 
@@ -20,36 +21,24 @@ app.use(expressJWT({
 }))
 app.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {   
-      //  这个需要根据自己的业务逻辑来处理（ 具体的err值 请看下面）
+      
     res.status(401).send('invalid token...');
   }
 })
 
 
 //设置允许跨域访问该服务.
-app.all('*', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  //Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Methods', '*');
-  res.header('Content-Type', 'application/json;charset=utf-8');
-  // res.header('Access-Control-Allow-Credentials','true');
-  next();
-});
-
-// app.use(session({
-//   secret: 'Zephyrhaha',
-//   resave: false,
-//   saveUninitialized: true,
-//   // rolling:true,
-//   cookie: ('name', 'value',
-//     { 
-//       maxAge:  5*1000*30,
-//       secure: false,
-//       name: "seName",    
-//       resave: false
-//     })
-// }))
+app.use(require("cors")())
+//或者：
+// app.all('*', function (req, res, next) {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   //Access-Control-Allow-Headers ,
+//   res.header('Access-Control-Allow-Headers', 'Content-Type');
+//   res.header('Access-Control-Allow-Methods', '*');
+//   res.header('Content-Type', 'application/json;charset=utf-8');
+//   // res.header('Access-Control-Allow-Credentials','true');
+//   next();
+// });
 
 
 app.use('/public/', express.static(path.join(__dirname,'./public/'))) //path.join:拼接路径，并且处理斜杠
@@ -67,5 +56,5 @@ app.use(word)
 app.use(member)
 
 app.listen(5230, () => {
-  console.log('running>> http://127.0.0.1:5230')
+  console.log('running>> http://192.168.0.105:5230')
 })

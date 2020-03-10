@@ -34,7 +34,7 @@ const getTempToken = function (phone) {
     deadline: Date.now() + 1000*60*5 //5分钟
   })
 
-  return tempToken = body +'&'+ sha256(body)
+  return tempToken = body +'&'+ sha256(body + "aowu")
 }
 
 

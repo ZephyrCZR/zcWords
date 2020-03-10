@@ -1,6 +1,29 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const recordSchema = new Schema({
+  date: {
+    type: Date,
+    default: Date.now
+  },
+  clock: {
+    type: Boolean,
+    default: false
+  },
+  learn: {
+    type: Number,
+    default: 0,
+  },
+  review: {
+    type: Number,
+    default: 0,
+  },
+  duration: {
+    type: Number,
+    default: 0
+  }
+})
+
 const usersSchema = new Schema({
   nickname: {
     type: String,
@@ -22,9 +45,9 @@ const usersSchema = new Schema({
     type: Array,
     default: [] //bookId, bookName, createDate, wordsCount
   },  
-  sign_days: { //连续签到天数
-    type: Number,
-    default: 0
+  calendar: { //日历表
+    type: Array,
+    default: [recordSchema]
   }, 
   last_login_time: {
     type: Date,

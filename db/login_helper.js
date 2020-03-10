@@ -162,9 +162,9 @@ const finishReg = function (local, auth_type) {
   return new Promise((resolve, reject) => {
     initUser(local.user_name).then(
 
-      (res) => {
+      (userInfo) => {
         AuthRel.create({
-            user_id: res._id,
+            user_id: userInfo._id,
             auth_id: local._id,
             auth_type: auth_type
           },
@@ -174,7 +174,7 @@ const finishReg = function (local, auth_type) {
                 _id: local._id
               }).then((suc) => {
                 return deleteADoc(Users, {
-                  _id: res._id
+                  _id: userInfo._id
                 })
               }, (err) => {
                 // user表、local表回退失败
@@ -188,7 +188,8 @@ const finishReg = function (local, auth_type) {
               })
 
             } else {
-              resolve(local)
+              //返回用户信息表
+              resolve(userInfo)
             }
           })
       }, (err) => {
@@ -287,7 +288,7 @@ const getUserIdByPhone = function (phone) {
   return new Promise((resolve, reject) => {
     LocalAuth.findOne({
       phone: phone
-    }).exec((err,doc) => {
+    }).exec((err, doc) => {
       console.log(doc);
       if (err) {
         reject(err)
@@ -334,6 +335,18 @@ const newLogTime = function (user_id) {
   }, () => {})
 }
 
+const getUserInfoById = function (user_id) {
+  return new Promise((resolve) => {
+   const id = user_id.toString()
+    Users.findById(id,(err, doc) => {
+      resolve(doc)
+    })
+  })
+}
+
+
+
+
 module.exports = {
   checkLocalRegInfo,
   localReg,
@@ -341,5 +354,6 @@ module.exports = {
   localLogin,
   newLogTime,
   findLocalUPhone,
-  getUserIdByPhone
+  getUserIdByPhone,
+  getUserInfoById
 }
