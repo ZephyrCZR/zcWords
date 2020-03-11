@@ -20,7 +20,7 @@ const bookSchema = new Schema({
   },
   next_date: {
     type: Date
-  },
+  }
 
 })
 

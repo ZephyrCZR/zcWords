@@ -1,11 +1,10 @@
 const express = require('express')
 const db = require('../db/login_helper')
-const jwt = require('jsonwebtoken')
+const jwt = require('../common/JWT')
 const msgAPI = require('../common/message_api')
 const utils = require('../common/utils')
 const sha256 = require('sha256')
 const router = express.Router()
-const SECRET = 'Zephyr'
 
 const tempStorage = new Map()
 
@@ -59,9 +58,9 @@ router.post('/zrizc/getmsg', (req, res) => {
 
 })
 
-router.get('/',(req,res) => {
+router.get('/', (req, res) => {
   res.status(200).json({
-   
+
     message: 'hahah'
   })
 })
@@ -69,6 +68,7 @@ router.get('/',(req,res) => {
 
 /**
  * 本地用户注册
+ * 登录成功返回用户信息文档，token
  */
 router.post('/zrizc/register', (req, res) => {
 
@@ -126,14 +126,14 @@ router.post('/zrizc/register', (req, res) => {
         })
       } else {
         db.localReg(body).then((doc) => {
+
           db.finishReg(doc, "local").then((userInfo) => {
 
             return db.getUserIdByPhone(body.phone).then(uid => {
-              const token = 'Bearer ' + jwt.sign({
+
+              const token = jwt({
                 _id: uid,
-                ban: false
-              }, SECRET, {
-                expiresIn: 3600 * 24 * 7
+                permission: 1
               })
 
               res.status(200).json({
@@ -144,6 +144,8 @@ router.post('/zrizc/register', (req, res) => {
               })
             })
 
+          }, (err) => {
+            console.log('错误测试点-finishReg');
           })
 
         }, (err) => {
@@ -168,6 +170,7 @@ router.post('/zrizc/register', (req, res) => {
 
 /** 
  * 本地用户登录
+ * 登录成功返回用户信息文档，token
  */
 router.post('/zrizc/login', (req, res) => {
 
@@ -184,13 +187,7 @@ router.post('/zrizc/login', (req, res) => {
       return
     }
 
-    // 默认情况 Token 必须以 Bearer+空格 开头
-    const token = 'Bearer ' + jwt.sign({
-      _id: user.user_id,
-      ban: user.permission === 0
-    }, SECRET, {
-      expiresIn: 3600 * 24 * 7
-    })
+    const token = jwt(user)
 
     //更新最后一次登录时间
     db.newLogTime(user.user_id)

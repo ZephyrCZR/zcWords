@@ -3,8 +3,8 @@ const Schema = mongoose.Schema
 
 const recordSchema = new Schema({
   date: {
-    type: Date,
-    default: Date.now
+    type: String,
+    default: ''
   },
   clock: {
     type: Boolean,
@@ -44,11 +44,7 @@ const usersSchema = new Schema({
   book_list: {
     type: Array,
     default: [] //bookId, bookName, createDate, wordsCount
-  },  
-  calendar: { //日历表
-    type: Array,
-    default: [recordSchema]
-  }, 
+  },
   last_login_time: {
     type: Date,
     default: Date.now
@@ -56,7 +52,8 @@ const usersSchema = new Schema({
   register_time: {
     type: Date,
     default: Date.now
-  }
+  },
+  calendar: [recordSchema]
 })
 
 module.exports = mongoose.model('Users', usersSchema)

@@ -38,6 +38,20 @@ const getTempToken = function (phone) {
 }
 
 
+// 时间戳转年月日
+const dateFormat = function(time) {
+  let date = new Date(time)
+  let arr = []
+  arr.push(date.getFullYear())
+  arr.push(date.getMonth() + 1)
+  arr.push(date.getDate())  
+  return arr.join('-')
+}
+
+
+
+
+
 module.exports = {
-  lateDays,matchMobile,matchPassword,randCode,getTempToken
+  lateDays,matchMobile,matchPassword,randCode,getTempToken,dateFormat
 }

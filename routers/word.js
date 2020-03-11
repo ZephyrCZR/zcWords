@@ -45,9 +45,10 @@ router.post('/upload', (req, res) => {
   })
 })
 
-router.post('/download', (req, res) => {
+//获取用户词书状态信息
+router.get('/word/download', (req, res) => {
 
-  const body = req.body
+  const body = req.query
 
   db.getUsersBookByBId(body.book_id).then((book) => {
     res.status(200).json(book)

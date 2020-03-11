@@ -1,13 +1,49 @@
 const db = require('../db/user_helper')
 const express = require('express')
+const jwt = require('../common/JWT')
 const router = express.Router()
 
+//: 0: 请求成功，1: 请求失败, 500: 服务器错误
+
+//每日上线初始化 返回用户信息表和新的token
+router.post('/zrizc/home/init', (req, res) => {
+  const body = req.body //接收一张信息表，同步用户上传的calendar数据
+  console.log("body:");
+  console.log(body);
+  db.getRecort(body).then((uInfo) => {
+    if (uInfo) {
+      const token = jwt({user_id: uInfo._id, permisson: uInfo.permisson})
+
+      res.status(200).json({
+        message: "每日初始化成功",
+        err_code: 0,
+        uInfo: uInfo,
+        token: token
+      })
+    } else {
+      res.status(200).json({
+        message: "今日已完成过初始化了",
+        err_code: 1
+      })
+    }
+  })
+})
 
 //签到
-router.post('/zrizc/clock', (req, res) => {
-  const body = req.body
-  
-  
+router.get('/zrizc/home/clock', (req, res) => {
+  const body = req.query
+  db.clock(body.user_id).then((msg) => {
+    res.status(200).json({
+      message: msg,
+      err_code: 0
+    })
+  }, (err) => {
+    res.status(500).json({
+      message: "服务器出错了",
+      err_code: 500
+    })
+  })
+})
 
 
-}) 
+module.exports = router
