@@ -6,11 +6,12 @@ const sha256 = require('sha256')
 // }
 
 
-// 返回一个bit位数的随机数
+// 返回一个digit位数的伪随机数
 const randCode = function (digit) {
-  let mul = Math.pow(10, digit) 
- return (Math.random() * mul).toFixed(0)
+  let Max = Math.pow(10, digit) 
+ return (Math.random() * (Max - 1000)  + 1000).toFixed(0)
 }
+
 
 //
 const lateDays = function (timestamp, days) {

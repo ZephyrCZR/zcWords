@@ -18,14 +18,15 @@ router.post('/zrizc/getmsg', (req, res) => {
   db.findLocalUPhone(body.phone).then((doc) => {
     console.log(doc);
     if (doc) {
-      res.status(200).json({
+      res.status(202).json({
         err_code: 1,
         message: '该手机号已经注册过了'
       })
     } else {
       const code = utils.randCode(4)
-
-      msgAPI(body.phone, code)
+  
+      // 暂时先关掉短信验证码服务
+      // msgAPI(body.phone, code)
 
       // 用于短信验证的临时token
       const tempToken = utils.getTempToken(body.phone)
@@ -58,12 +59,7 @@ router.post('/zrizc/getmsg', (req, res) => {
 
 })
 
-router.get('/', (req, res) => {
-  res.status(200).json({
 
-    message: 'hahah'
-  })
-})
 // err_code: 0:注册/登录成功；  1：注册/登录失败，用户名或手机号已经存在/账号密码错误； 401：短信验证码错误/封号  500： 服务器错误
 
 /**
@@ -75,7 +71,7 @@ router.post('/zrizc/register', (req, res) => {
   const body = req.body
 
   if (!utils.matchMobile(body.phone)) {
-    res.status(200).json({
+    res.status(401).json({
       err_code: 4444444,
       message: '臭傻逼，攻击我我要报警了！！！'
     })
@@ -120,7 +116,7 @@ router.post('/zrizc/register', (req, res) => {
 
     db.findLocalUPhone(body.phone).then(msg => {
       if (msg) {
-        res.status(200).json({
+        res.status(202).json({
           err_code: 1,
           message: '该手机号已经注册过了'
         })
@@ -204,7 +200,7 @@ router.post('/zrizc/login', (req, res) => {
     })
 
   }, (err) => {
-    res.status(200).json({
+    res.status(500).json({
       err_code: 1,
       message: err
     })

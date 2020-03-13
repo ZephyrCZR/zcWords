@@ -11,9 +11,9 @@ router.post('/zrizc/home/init', (req, res) => {
   console.log("body:");
   console.log(body);
   db.getRecort(body).then((uInfo) => {
+    console.log(uInfo);
     if (uInfo) {
-      const token = jwt({user_id: uInfo._id, permisson: uInfo.permisson})
-
+      const token = jwt({user_id: uInfo._id, permisson: uInfo.permisson})     
       res.status(200).json({
         message: "每日初始化成功",
         err_code: 0,
@@ -29,17 +29,21 @@ router.post('/zrizc/home/init', (req, res) => {
   })
 })
 
+
 //签到
 router.get('/zrizc/home/clock', (req, res) => {
+  console.log(req.query);
   const body = req.query
-  db.clock(body.user_id).then((msg) => {
+  db.clock(body.user_id).then((uInfo) => {
+    console.log(uInfo);
     res.status(200).json({
-      message: msg,
+      message: uInfo,
+      uInfo: uInfo,
       err_code: 0
     })
   }, (err) => {
     res.status(500).json({
-      message: "服务器出错了",
+      message: err,
       err_code: 500
     })
   })

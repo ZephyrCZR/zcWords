@@ -12,13 +12,13 @@ require('./db/connect')
 const word = require('./routers/word')
 const member = require('./routers/member')
 const info = require('./routers/info')
-
+const server = require('./routers/server')
 // jwt：
 const secretOrPrivateKey = "Zephyr"  //加密token 校验token时要使用
 app.use(expressJWT({
     secret: secretOrPrivateKey   
 }).unless({
-    path: ['/zrizc/register','/zrizc/login','/zrizc/getmsg','/zrizc/resetpassword', '/zrizc/clock', '/zrizc/home/init']  //除了这些地址，其他的URL都需要验证
+    path: ['/zrizc/register','/zrizc/login','/zrizc/getmsg','/zrizc/resetpassword', '/zrizc/clock', '/zrizc/home/init', '/zrizc/server/getserverbooks']  //除了这些地址，其他的URL都需要验证
 }))
 app.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {   
@@ -56,6 +56,7 @@ app.use(bodyParser.json())
 app.use(word)
 app.use(member)
 app.use(info)
+app.use(server)
 
 app.listen(5230, () => {
   console.log('running>> http://192.168.0.105:5230')
