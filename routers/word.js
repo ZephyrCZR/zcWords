@@ -2,27 +2,29 @@ const express = require('express')
 const db = require('../db/word_helper')
 const router = express.Router()
 
-/** 添加新词书
+/** 添加新词书并设为当前词书，返回用户信息表
  * @param {用户id} user_id
  * @param {词书名} book_name
  */
-router.get('/addbook', (req, res) => {
-
+router.get('/zrizc/word/addbook', (req, res) => {
   console.log(req.query); 
+
   if (req.user.ban){
     return res.sendStatus(401)
-  }
-  
+  }  
 
-  let user_id = req.query.user_id
+  let user_id = req.user._id
   let book_name = req.query.book_name
-  db.addUserBook(user_id, book_name).then((result) => {
+  db.addUserBook(user_id, book_name).then((uInfo) => {
     res.status(201).json({
-      message: result
+      message: '添加成功',
+      err_code: 0,
+      uInfo: uInfo
     })
   },(error) => {
-    res.status(500).json({
-      message: error
+    res.status(202).json({
+      message: error,
+      err_code: 1
     })
   })
 })

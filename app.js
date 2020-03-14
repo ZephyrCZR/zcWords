@@ -18,7 +18,7 @@ const secretOrPrivateKey = "Zephyr"  //加密token 校验token时要使用
 app.use(expressJWT({
     secret: secretOrPrivateKey   
 }).unless({
-    path: ['/zrizc/register','/zrizc/login','/zrizc/getmsg','/zrizc/resetpassword', '/zrizc/clock', '/zrizc/home/init', '/zrizc/server/getserverbooks']  //除了这些地址，其他的URL都需要验证
+    path: ['/zrizc/register','/zrizc/login','/zrizc/getmsg']  //除了这些地址，其他的URL都需要验证
 }))
 app.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {   
@@ -41,9 +41,9 @@ app.use(require("cors")())
 //   next();
 // });
 
-
+//开放静态资源
 app.use('/public/', express.static(path.join(__dirname,'./public/'))) //path.join:拼接路径，并且处理斜杠
-app.use('/node_modules', express.static(path.join(__dirname, './node_modules/')))
+app.use('/node_modules/', express.static(path.join(__dirname, './node_modules/')))
 
 // app.engine('html', require('express-art-template'))
 // app.set('views', path.join(__dirname, './views/'))//默认就是./views

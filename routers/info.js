@@ -13,7 +13,10 @@ router.post('/zrizc/home/init', (req, res) => {
   db.getRecort(body).then((uInfo) => {
     console.log(uInfo);
     if (uInfo) {
-      const token = jwt({user_id: uInfo._id, permisson: uInfo.permisson})     
+      const token = jwt({
+        user_id: uInfo._id,
+        permisson: uInfo.permisson
+      })
       res.status(200).json({
         message: "每日初始化成功",
         err_code: 0,
@@ -41,10 +44,17 @@ router.get('/zrizc/home/clock', (req, res) => {
       uInfo: uInfo,
       err_code: 0
     })
-  }, (err) => {
-    res.status(500).json({
-      message: err,
-      err_code: 500
+  })
+})
+
+//根据用户id返回用户信息表
+router.get('/zrizc/home/getUserInfo', (req, res) => {
+  const uid = req.user._id
+  db.getUserInfo(uid).then(uInfo => {
+    res.status(200).json({
+      message: uInfo,
+      uInfo: uInfo,
+      err_code: 0
     })
   })
 })

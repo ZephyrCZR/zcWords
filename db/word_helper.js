@@ -2,8 +2,9 @@ const Lib = require('./models/server/wordLib')
 const UserBook = require('./models/user/userBook')
 const User = require('../db/models/user/user')
 const Book = require('./models/server/book')
-// const connect = require('./connect')
+const connect = require('./connect')
 const ObjectId = require('objectid')
+
 
 /**添加用户词书
  * 
@@ -17,9 +18,7 @@ const addUserBook = (user_id, book_name) => {
       return checkUserBook(book.book_list, book_name)
 
     }, (err) => {
-
       reject(err)
-
     }).then((flag) => {
 
       if (flag) {
@@ -29,57 +28,69 @@ const addUserBook = (user_id, book_name) => {
       }
 
     }).then((book_id) => {
-      //添加到用户信息表
-      if (book_id) {
-        return addBookToUser(user_id, book_id)
-      }
 
-    }).then(() => {
-      resolve("添加词书成功")
+      Book.findOne({
+          book_name: book_name
+        })
+        .select(['book_name', 'book_type', 'describe', 'cover_img', 'amount'])
+        .exec((err, book_info) => {
+          if (err) {
+            reject(err)
+          } else {
+            //添加到用户信息表
+            if (book_id) {
+              const ubook = book_info
+              ubook._id = book_id
+              addBookToUser(user_id, book_info).then((uInfo) => {
+                // 返回用户信息表
+                resolve(uInfo)
+              })
+            }
+          }
+        })
+
     })
   })
 }
+
 
 //获取用户的词书列表
 const getUserBookList = (user_id) => {
   return new Promise((resolve, reject) => {
-    User.findById(user_id).select("book_list").exec((err, doc) => {
+    User.findById(user_id).select("book_list.book_name").exec((err, list) => {
       if (err) {
         reject(err)
       } else {
-        if (doc) {
-          resolve(doc)
-        }else{
+        if (list) {
+          resolve(list)
+        } else {
           reject("该用户不存在");
-        }       
+        }
       }
     })
   })
 }
+// getUserBookList('5e69a3d7accd6c0e18117a89').then((res) => {
+//   console.log(res);
+// })
+
 
 //检验是否已拥有该词书
 const checkUserBook = function (list, book_name) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    let flag = false
     if (list.length === 0) {
-      resolve(false)
+      resolve(flag)
     }
-
-    let round = 0
-
-    list.forEach((id) => {
-      UserBook.findById(id).select("book_name").exec((err, doc) => {
-        if (err) {
-          reject(err)
-        } else if (doc && doc.book_name === book_name) {
-          resolve(true)
-        } else {
-          round++
-          if (round === list.length) {
-            resolve(false)
-          }
-        }
-      })
+    
+    list.forEach(el => {
+      if (el.book_name === book_name) {
+        flag = true
+        // break
+      }
     })
+    console.log(flag);
+    resolve(flag)
   })
 }
 
@@ -132,12 +143,12 @@ const findBook = (book_name) => {
 }
 
 //添加词书到用户表
-const addBookToUser = (user_id, book_id) => {
+const addBookToUser = (user_id, book_info) => {
   return new Promise((resolve, reject) => {
     User.findByIdAndUpdate(user_id, {
       $addToSet: {
         book_list: [
-          book_id
+          book_info
         ]
       }
     }, (err, doc) => {
@@ -150,11 +161,10 @@ const addBookToUser = (user_id, book_id) => {
   })
 }
 
-// addUserBook("5e622466a22b335b48240b13", "common2000").then((suc) => {
-//   console.log(suc);
-// }, (err) => console.log(err))
 
-
+// addUserBook('5e6c22da77c04302e83bb93a', '高考3500词').then((er) => {
+//   console.log(er);
+// })
 
 /**获取用户词书中，状态为state的单词（ 0: 未背； 1：已背； 2：已掌握 ）
  * 

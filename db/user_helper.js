@@ -12,6 +12,18 @@ if (time.getHours < 4) {
 console.log("当前系统日期为：" + sysdate);
 
 
+const getUserInfo = function (user_id) {
+  return new Promise((resolve, reject) => {
+    Users.findById(user_id).exec((err, doc) => {
+      if (err) {
+        reject(err)
+      }else{
+        resolve(doc)
+      }      
+    })
+  })
+}
+
 /**操作用户信息表
  * 
  * @param {查询目标} query 
@@ -19,7 +31,7 @@ console.log("当前系统日期为：" + sysdate);
  */
 const setUsers = function (query, target) {
   return new Promise((resolve, reject) => {
-    LocalAuth.findOneAndUpdate(query, {
+    Users.findOneAndUpdate(query, {
         $set: target
       },
       (err, res) => {
@@ -153,5 +165,6 @@ const clock = function (user_id) {
 module.exports = {
   setUsers,
   getRecort,
-  clock
+  clock,
+  getUserInfo
 }
