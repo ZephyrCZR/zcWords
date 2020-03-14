@@ -142,10 +142,13 @@ const findBook = (book_name) => {
   })
 }
 
-//添加词书到用户表
+//添加词书到用户表，并且设为当前词书
 const addBookToUser = (user_id, book_info) => {
   return new Promise((resolve, reject) => {
     User.findByIdAndUpdate(user_id, {
+      $set:{
+        book_id: book_info._id
+      },
       $addToSet: {
         book_list: [
           book_info
