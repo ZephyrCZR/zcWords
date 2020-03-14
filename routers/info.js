@@ -50,6 +50,7 @@ router.get('/zrizc/home/clock', (req, res) => {
 //根据用户id返回用户信息表
 router.get('/zrizc/home/getUserInfo', (req, res) => {
   const uid = req.user._id
+  console.log(req.user);
   db.getUserInfo(uid).then(uInfo => {
     res.status(200).json({
       message: uInfo,

@@ -126,9 +126,8 @@ router.post('/zrizc/register', (req, res) => {
           db.finishReg(doc, "local").then((userInfo) => {
 
             return db.getUserIdByPhone(body.phone).then(uid => {
-
               const token = jwt({
-                _id: uid,
+                user_id: uid,
                 permission: 1
               })
 

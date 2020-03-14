@@ -22,6 +22,7 @@ router.get('/zrizc/word/addbook', (req, res) => {
       uInfo: uInfo
     })
   },(error) => {
+    console.log(error);
     res.status(202).json({
       message: error,
       err_code: 1
@@ -51,7 +52,7 @@ router.post('/upload', (req, res) => {
 router.get('/word/download', (req, res) => {
 
   const body = req.query
-
+console.log(body);
   db.getUsersBookByBId(body.book_id).then((book) => {
     res.status(200).json(book)
   })
