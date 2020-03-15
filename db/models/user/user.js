@@ -33,9 +33,9 @@ const usersSchema = new Schema({
     type: String,
     default: '/public/img/avatar-default.png'
   },
-  star_coin: {
+  coin: {
     type: Number,
-    default: 10,
+    default: 110,
     required: true
   },
   book_id: {

@@ -26,7 +26,8 @@ router.post('/zrizc/home/init', (req, res) => {
     } else {
       res.status(200).json({
         message: "今日已完成过初始化了",
-        err_code: 1
+        err_code: 1,
+        uInfo: uInfo,
       })
     }
   })

@@ -32,7 +32,7 @@ router.get('/zrizc/word/addbook', (req, res) => {
 
 
 //上传词书数据
-router.post('/upload', (req, res) => {
+router.post('/zrizc/word/upload', (req, res) => {
   const token = req.user
   const body = req.body
 
@@ -49,7 +49,7 @@ router.post('/upload', (req, res) => {
 })
 
 //获取用户词书状态信息
-router.get('/word/download', (req, res) => {
+router.get('/zrizc/word/bookinfo', (req, res) => {
 
   const body = req.query
 console.log(body);

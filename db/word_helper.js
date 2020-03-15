@@ -154,7 +154,7 @@ const addBookToUser = (user_id, book_info) => {
           book_info
         ]
       }
-    }, (err, doc) => {
+    }, {new:true},  (err, doc) => {
       if (err) {
         reject(err)
       } else {
@@ -402,5 +402,5 @@ const getUsersBookByBId = function (book_id) {
 // })
 module.exports = {
   addUserBook,
-
+  getUsersBookByBId
 }

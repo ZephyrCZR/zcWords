@@ -70,7 +70,7 @@ const getRecort = function (uInfo) {
       //初始化系统记录表
     }
 
-    //查系统服务记录表，判断当前用户是否已创建今日记录表，若未创建则创建，已创建，则返回提示
+    //查系统服务记录表，判断当前用户是否已创建今日记录表，若未创建则创建，已创建，则返回用户信息表
     console.log(uInfo);
     const user_id = uInfo._id
     Users.findOne({
@@ -82,7 +82,7 @@ const getRecort = function (uInfo) {
       }
       //判断该用户今日是否已创建记录表
       if (doc) {
-        resolve(false)
+        resolve(doc)
         console.log('该用户今日记录表已存在');
       } else {
         //如果 uInfo.calendar 有数据
