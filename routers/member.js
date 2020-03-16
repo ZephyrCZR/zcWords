@@ -11,12 +11,10 @@ const tempStorage = new Map()
 /**
  * 获取短信验证码
  */
-router.post('/zrizc/getmsg', (req, res) => {
+router.post('/member/getmsg', (req, res) => {
   const body = req.body
-  console.log(body);
 
   db.findLocalUPhone(body.phone).then((doc) => {
-    console.log(doc);
     if (doc) {
       res.status(202).json({
         err_code: 1,
@@ -64,9 +62,9 @@ router.post('/zrizc/getmsg', (req, res) => {
 
 /**
  * 本地用户注册
- * 登录成功返回用户信息文档，token
+ * 登录成功返回用户信息文档，token, uInfo
  */
-router.post('/zrizc/register', (req, res) => {
+router.post('/member/register', (req, res) => {
 
   const body = req.body
 
@@ -123,7 +121,7 @@ router.post('/zrizc/register', (req, res) => {
       } else {
         db.localReg(body).then((doc) => {
 
-          db.finishReg(doc, "local").then((userInfo) => {
+          db.finishReg(doc, "local").then((uInfo) => {
 
             return db.getUserIdByPhone(body.phone).then(uid => {
               const token = jwt({
@@ -135,7 +133,7 @@ router.post('/zrizc/register', (req, res) => {
                 err_code: 0,
                 message: '注册成功',
                 token: token,
-                userInfo: userInfo
+                uInfo: uInfo
               })
             })
 
@@ -165,9 +163,9 @@ router.post('/zrizc/register', (req, res) => {
 
 /** 
  * 本地用户登录
- * 登录成功返回用户信息文档，token
+ * 登录成功返回用户信息文档，token, uInfo
  */
-router.post('/zrizc/login', (req, res) => {
+router.post('/member/login', (req, res) => {
 
   const body = req.body
 
@@ -188,18 +186,18 @@ router.post('/zrizc/login', (req, res) => {
     db.newLogTime(user.user_id)
 
     // 发送用户信息
-    db.getUserInfoById(user.user_id).then((userInfo) => {
-      console.log(userInfo);
+    db.getUserInfoById(user.user_id).then((uInfo) => {
+      console.log(uInfo);
       res.status(200).json({
         message: '登录成功',
         err_code: 0,
         token: token,
-        userInfo: userInfo
+        uInfo: uInfo
       })
     })
 
   }, (err) => {
-    res.status(500).json({
+    res.status(401).json({
       err_code: 1,
       message: err
     })

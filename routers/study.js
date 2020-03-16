@@ -6,7 +6,7 @@ const router = express.Router()
  * @param {用户id} user_id
  * @param {词书名} book_name
  */
-router.get('/zrizc/word/addbook', (req, res) => {
+router.get('/zrizc/study/addbook', (req, res) => {
   console.log(req.query); 
 
   if (req.user.ban){
@@ -32,29 +32,34 @@ router.get('/zrizc/word/addbook', (req, res) => {
 
 
 //上传词书数据
-router.post('/zrizc/word/upload', (req, res) => {
+router.post('/zrizc/study/upload', (req, res) => {
   const token = req.user
   const body = req.body
 
   const uid = token.uid
   db.syncUsersBook(token.uid, body.statelist).then(() => {
     res.status(200).json({
-      message: '数据同步成功'
+      message: '数据同步成功',
+      err_code: 0
     })
   },() => {
     res.status(500).json({
-      message: '数据同步失败'
+      message: '数据同步失败',
+      err_code: 0
     })
   })
 })
 
 //获取用户词书状态信息
-router.get('/zrizc/word/bookinfo', (req, res) => {
+router.get('/zrizc/study/bookinfo', (req, res) => {
 
-  const body = req.query
+const body = req.query
 console.log(body);
   db.getUsersBookByBId(body.book_id).then((book) => {
-    res.status(200).json(book)
+    res.status(200).json({
+      book_info: book,
+      err_code: 0
+    })
   })
 
 

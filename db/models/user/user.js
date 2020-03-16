@@ -18,9 +18,29 @@ const recordSchema = new Schema({
     type: Number,
     default: 0,
   },
-  duration: {
+  duration: { //连续签到时间，未实现该功能
     type: Number,
     default: 0
+  }
+})
+
+const configSchema = new Schema({
+  numbers: {
+    type: Number,
+    min: 10, max: 30,
+    default: 20   
+  },
+  auto_audio: {
+    type: Boolean,
+    default: false
+  },
+  is_kk: {
+    type: Boolean,
+    default: false
+  },
+  isHold: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -53,7 +73,20 @@ const usersSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  calendar: [recordSchema]
+  config: {
+    type: {configSchema},
+    default: {
+      numbers: 20,
+      auto_audio: false,
+      is_kk: false,
+      isHold: false
+    }
+  },
+  calendar:{
+    type: [recordSchema],
+    default: undefined
+  } 
+
 })
 
 module.exports = mongoose.model('Users', usersSchema)

@@ -9,20 +9,19 @@ const app = express()
 require('./db/connect')
 
 // 注册路由：
-const word = require('./routers/word')
+const study = require('./routers/study')
 const member = require('./routers/member')
-const info = require('./routers/info')
 const server = require('./routers/server')
+
 // jwt：
 const secretOrPrivateKey = "Zephyr"  //加密token 校验token时要使用
 app.use(expressJWT({
     secret: secretOrPrivateKey   
 }).unless({
-    path: ['/zrizc/register','/zrizc/login','/zrizc/getmsg']  //除了这些地址，其他的URL都需要验证
+    path: ['/member/register','/member/login','/member/getmsg']  //除了这些地址，其他的URL都需要验证
 }))
 app.use(function (err, req, res, next) {
-  if (err.name === 'UnauthorizedError') {   
-      
+  if (err.name === 'UnauthorizedError') {      
     res.status(401).send('invalid token...');
   }
 })
@@ -53,9 +52,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // 挂载路由
-app.use(word)
+app.use(study)
 app.use(member)
-app.use(info)
 app.use(server)
 
 app.listen(5230, () => {

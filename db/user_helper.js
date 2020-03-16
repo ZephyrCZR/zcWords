@@ -51,7 +51,7 @@ const setUsers = function (query, target) {
  * 失败则返回false (通过resolve) 
  * uInfo：{
 		_id: INFO._id,
-		calendar: INFO.calendar[0]
+		calendar: INFO.calendar[INFO.calendar.length-1]
 	}
  * @param {用户id} user_id 
  */
@@ -87,7 +87,7 @@ const getRecort = function (uInfo) {
       } else {
         //如果 uInfo.calendar 有数据
         if (uInfo.calendar) {
-          //同步用户上传的calendar数据（不可能存在两个未同步的calendar文档，所以只同步用户上传的那个（最新的）就够了）
+          //同步用户上传的calendar数据（理论上不存在两个未同步的calendar文档，所以只同步用户上传的那个（最新的）就够了）
           Users.updateOne({
             "_id": user_id,
             "calendar.date": uInfo.calendar.date
@@ -108,7 +108,7 @@ const getRecort = function (uInfo) {
               "date": sysdate
             }]
           }
-        }).exec((err, uInfo) => {
+        },{new: true}).exec((err, uInfo) => {
           if (err) {
             reject(err)
           } else {
