@@ -1,11 +1,11 @@
-const server_helper = require('../db/server_helper')
-const user_helper = require('../db/user_helper')
+const server_helper = require('../service/server')
+const user_helper = require('../service/user')
 const express = require('express')
-const jwt = require('../common/JWT')
+const jwt = require('../common/jwt')
 const router = express.Router()
 
 
-//: 0: 请求成功，1: 请求失败, 500: 服务器错误
+//err_code: 0: 请求成功，1: 请求失败, 3: 发生错误
 
 //每日上线初始化 返回用户信息表和新的token 请求参数：一张用户记录表
 router.post('/zrizc/server/init', (req, res) => {
@@ -18,7 +18,7 @@ router.post('/zrizc/server/init', (req, res) => {
   console.log("body:");
   console.log(body);
   user_helper.getRecort(body).then((uInfo) => {
-    console.log(uInfo);
+    console.log("初始化："+uInfo);
     if (uInfo) {
       const token = jwt({
         user_id: uInfo._id,
@@ -33,7 +33,7 @@ router.post('/zrizc/server/init', (req, res) => {
     } else {
       res.status(202).json({
         message: "今日已完成过初始化了",
-        err_code: 1,
+        err_code: 0,
         uInfo: uInfo,
       })
     }
@@ -47,7 +47,7 @@ router.get('/zrizc/server/clock', (req, res) => {
   user_helper.clock(user_id).then((uInfo) => {
     console.log(uInfo);
     res.status(200).json({
-      message: uInfo,
+      message: '签到成功',
       uInfo: uInfo,
       err_code: 0
     })
@@ -55,7 +55,7 @@ router.get('/zrizc/server/clock', (req, res) => {
 })
 
 //根据用户id返回用户信息表
-router.get('/zrizc/server/getUserInfo', (req, res) => {
+router.get('/zrizc/server/getuinfo', (req, res) => {
   const uid = req.user._id
   console.log(req.user);
   user_helper.getUserInfo(uid).then(uInfo => {

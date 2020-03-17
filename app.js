@@ -6,7 +6,7 @@ const expressJWT = require('express-jwt');
 const app = express()
 
 // 连接数据库：
-require('./db/connect')
+require('./connect')
 
 // 注册路由：
 const study = require('./routers/study')

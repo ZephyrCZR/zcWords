@@ -1,8 +1,8 @@
-const Lib = require('./models/server/wordLib')
-const UserBook = require('./models/user/userBook')
-const User = require('../db/models/user/user')
-const Book = require('./models/server/book')
-const connect = require('./connect')
+const Lib = require('../models/server/wordLib')
+const UserBook = require('../models/user/userBook')
+const User = require('../models/user/user')
+const Book = require('../models/server/book')
+// const connect = require('../connect')
 const ObjectId = require('objectid')
 
 
@@ -82,7 +82,7 @@ const checkUserBook = function (list, book_name) {
     if (list.length === 0) {
       resolve(flag)
     }
-    
+
     list.forEach(el => {
       if (el.book_name === book_name) {
         flag = true
@@ -146,7 +146,7 @@ const findBook = (book_name) => {
 const addBookToUser = (user_id, book_info) => {
   return new Promise((resolve, reject) => {
     User.findByIdAndUpdate(user_id, {
-      $set:{
+      $set: {
         book_id: book_info._id
       },
       $addToSet: {
@@ -154,7 +154,9 @@ const addBookToUser = (user_id, book_info) => {
           book_info
         ]
       }
-    }, {new:true},  (err, doc) => {
+    }, {
+      new: true
+    }, (err, doc) => {
       if (err) {
         reject(err)
       } else {

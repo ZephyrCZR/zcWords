@@ -1,6 +1,6 @@
 const express = require('express')
-const db = require('../db/login_helper')
-const jwt = require('../common/JWT')
+const service_login = require('../service/login')
+const jwt = require('../common/jwt')
 const msgAPI = require('../common/message_api')
 const utils = require('../common/utils')
 const sha256 = require('sha256')
@@ -14,7 +14,7 @@ const tempStorage = new Map()
 router.post('/member/getmsg', (req, res) => {
   const body = req.body
 
-  db.findLocalUPhone(body.phone).then((doc) => {
+  service_login.findLocalUPhone(body.phone).then((doc) => {
     if (doc) {
       res.status(202).json({
         err_code: 1,
@@ -112,18 +112,18 @@ router.post('/member/register', (req, res) => {
   // 短信验证
   if (tempInfo && tempInfo.code === body.code && body.token) {
 
-    db.findLocalUPhone(body.phone).then(msg => {
+    service_login.findLocalUPhone(body.phone).then(msg => {
       if (msg) {
         res.status(202).json({
           err_code: 1,
           message: '该手机号已经注册过了'
         })
       } else {
-        db.localReg(body).then((doc) => {
+        service_login.localReg(body).then((doc) => {
 
-          db.finishReg(doc, "local").then((uInfo) => {
+          service_login.finishReg(doc, "local").then((uInfo) => {
 
-            return db.getUserIdByPhone(body.phone).then(uid => {
+            return service_login.getUserIdByPhone(body.phone).then(uid => {
               const token = jwt({
                 user_id: uid,
                 permission: 1
@@ -169,7 +169,7 @@ router.post('/member/login', (req, res) => {
 
   const body = req.body
 
-  db.localLogin(body).then((user) => {
+  service_login.localLogin(body).then((user) => {
 
     //验证黑名单
     if (user.permission === 0) {
@@ -183,10 +183,10 @@ router.post('/member/login', (req, res) => {
     const token = jwt(user)
 
     //更新最后一次登录时间
-    db.newLogTime(user.user_id)
+    service_login.newLogTime(user.user_id)
 
     // 发送用户信息
-    db.getUserInfoById(user.user_id).then((uInfo) => {
+    service_login.getUserInfoById(user.user_id).then((uInfo) => {
       console.log(uInfo);
       res.status(200).json({
         message: '登录成功',

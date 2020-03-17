@@ -6,14 +6,14 @@
  * finishReg： 完成注册，生成授权关联表和创建用户信息
  * localLogin： 本地登录
  */
-const Users = require('./models/user/user')
-const AuthRel = require('../db/models/login/userAuthRel')
-const LocalAuth = require('../db/models/login/userLocalAuth')
+const Users = require('../models/user/user')
+const AuthRel = require('../models/login/userAuthRel')
+const LocalAuth = require('../models/login/userLocalAuth')
 // const ThirdAuth = require('../db/models/login/userThirdAuth')
 // const tools = require('../common/utils')
 const sha256 = require('sha256')
 
-require('./connect')
+// require('../connect')
 
 const encrypt = function (data) {
   return sha256(data + "Zephyr")

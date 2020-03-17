@@ -1,5 +1,5 @@
-const Book = require('./models/server/book')
-require('./connect')
+const Book = require('../models/server/book')
+// require('../connect')
 
 const getServerBooksList = function () {
   return new Promise((resolve, reject) => {

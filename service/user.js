@@ -1,15 +1,7 @@
-const Users = require('./models/user/user')
+const Users = require('../models/user/user')
 const utils = require('../common/utils')
 // require('./connect')
-//系统日期初始化：
-const now = Date.now()
-const time = new Date(now)
-let sysdate = utils.dateFormat(now)
-//系统启动时，若当天时间未超过凌晨四点，则系统日期记录为前一天
-if (time.getHours < 4) {
-  sysdate = utils.dateFormat(now - 1000 * 60 * 24)
-}
-console.log("当前系统日期为：" + sysdate);
+
 
 
 const getUserInfo = function (user_id) {
@@ -59,17 +51,19 @@ const getRecort = function (uInfo) {
   const now = Date.now()
   const time = new Date(now)
   const date = utils.dateFormat(now)
-
-  return new Promise((resolve, reject) => {
-
+   //系统日期：
+  let sysdate = utils.dateFormat(now)
+  if (time.getHours < 4) {
+    //若当天时间未超过凌晨四点，则系统日期记录为前一天
+    sysdate = utils.dateFormat(now - 1000 * 60 * 24)
+  }
     //判断当前时间，每天时间超过早上4点的第一次接收到请求，刷新系统标记的时间
     //如果系统记录日期不等于当前日期，说明日期发生了变化（过了一天）,并且超过凌晨4点时
     if (sysdate !== date && time.getHours > 4) {
       //更新系统记录的日期
-      sysdate = date
-      //初始化系统记录表
+      sysdate = date      
     }
-
+  return new Promise((resolve, reject) => {
     //查系统服务记录表，判断当前用户是否已创建今日记录表，若未创建则创建，已创建，则返回用户信息表
     console.log(uInfo);
     const user_id = uInfo._id
