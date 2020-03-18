@@ -48,21 +48,9 @@ const setUsers = function (query, target) {
  * @param {用户id} user_id 
  */
 const getRecort = function (uInfo) {
-  const now = Date.now()
-  const time = new Date(now)
-  const date = utils.dateFormat(now)
    //系统日期：
-  let sysdate = utils.dateFormat(now)
-  if (time.getHours < 4) {
-    //若当天时间未超过凌晨四点，则系统日期记录为前一天
-    sysdate = utils.dateFormat(now - 1000 * 60 * 24)
-  }
-    //判断当前时间，每天时间超过早上4点的第一次接收到请求，刷新系统标记的时间
-    //如果系统记录日期不等于当前日期，说明日期发生了变化（过了一天）,并且超过凌晨4点时
-    if (sysdate !== date && time.getHours > 4) {
-      //更新系统记录的日期
-      sysdate = date      
-    }
+  let sysdate = utils.dateFormat(Date.now() - 4*60*60*1000) //慢4个小时
+
   return new Promise((resolve, reject) => {
     //查系统服务记录表，判断当前用户是否已创建今日记录表，若未创建则创建，已创建，则返回用户信息表
     console.log(uInfo);
@@ -126,6 +114,8 @@ const getRecort = function (uInfo) {
  * @param {*} user_id 
  */
 const clock = function (user_id) {
+  //系统日期：
+  let sysdate = utils.dateFormat(Date.now() - 4*60*60*1000) //慢4个小时
   return new Promise((resolve, reject) => {
     console.log(user_id);
     Users.findOneAndUpdate({
@@ -149,7 +139,7 @@ const clock = function (user_id) {
         console.log(doc);
         resolve(doc)
       } else {
-        reject('请不要重复打卡')
+        reject('请不要重复签到')
       }
     })
   })
