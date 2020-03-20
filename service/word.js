@@ -284,19 +284,35 @@ const getUsersBookByBId = function (book_id) {
 // syncUsersBook("5e6344aad7906a193432e27e",)
 
 
-// /**通过单词id的数组查询所有单词
-//  * 
-//  * @param {单词Id数组} wordsIdArr 
-//  * @param {回调函数} fun 
-//  */
-// const getWordsArrByIdArr = function (wordsIdArr, fun) {
-//   wordsIdArr.forEach(el => {
-//     findWordById(el, function (res) {
-//       fun(res)
-//     })
-//   });
-// }
+/**通过单词id的数组查询所有单词
+ * 
+ * @param {单词Id数组} wordsIdArr 
+ */
 
+const getWordsArrByIdArr = async function (wordsIdArr) {  
+    let wordsInfo = []
+    for (let i=0; i<wordsIdArr.length; ) {      
+        const el = wordsIdArr[i];
+        wordsInfo.push(await findWordById(el))
+        i++
+      }
+    return wordsInfo
+}
+
+/**根据 wordId 从单词总库中查找一个单词
+ * 
+ * @param {单词Id} wordId 
+ */
+const findWordById = function (wordId) {
+  return new Promise((resolve) => {
+    Lib.findById(wordId, (err, doc) => {
+      if (err) {
+        throw err
+      }
+      resolve(doc)
+    })
+  })
+}
 
 
 
@@ -329,18 +345,7 @@ const getUsersBookByBId = function (book_id) {
 //   })
 // }
 
-// /**根据 wordId 从单词总库中查找一个单词
-//  * 
-//  * @param {单词Id} wordId 
-//  */
-// const findWordById = function (wordId, fun) {
-//   Lib.findByIdAndUpdate(wordId, (err, doc) => {
-//     if (err) {
-//       throw err
-//     }
-//     fun(doc)
-//   })
-// }
+
 
 // findWord("aw", (res) => {
 //   console.log(res);
@@ -404,5 +409,6 @@ const getUsersBookByBId = function (book_id) {
 // })
 module.exports = {
   addUserBook,
-  getUsersBookByBId
+  getUsersBookByBId,
+  getWordsArrByIdArr
 }

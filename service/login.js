@@ -160,8 +160,6 @@ const deleteADoc = function (Collection, query) {
  */
 const finishReg = function (local, auth_type) {
   return new Promise((resolve, reject) => {
-    console.log(local);
-    console.log(local.user_name);
     initUser(local.user_name).then(
 
       (userInfo) => {

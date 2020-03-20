@@ -22,7 +22,7 @@ router.post('/member/getmsg', (req, res) => {
       })
     } else {
       const code = utils.randCode(4)
-  
+      console.log(code);
       // 暂时先关掉短信验证码服务
       // msgAPI(body.phone, code)
 
@@ -43,7 +43,6 @@ router.post('/member/getmsg', (req, res) => {
           }
         })
       }
-      console.log(tempStorage);
       res.status(200).json({
         temptoken: tempToken,
         err_code: 0,
@@ -75,11 +74,8 @@ router.post('/member/register', (req, res) => {
     })
   }
 
-  console.log(body);
-  console.log(tempStorage);
-
   const tempInfo = tempStorage.get(body.phone)
-  console.log(tempInfo);
+
   if (!tempInfo) {
 
     res.status(401).json({
@@ -187,7 +183,7 @@ router.post('/member/login', (req, res) => {
 
     // 发送用户信息
     service_login.getUserInfoById(user.user_id).then((uInfo) => {
-      console.log(uInfo);
+
       res.status(200).json({
         message: '登录成功',
         err_code: 0,

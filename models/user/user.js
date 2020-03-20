@@ -38,7 +38,7 @@ const configSchema = new Schema({
     type: Boolean,
     default: false
   },
-  isHold: {
+  is_hold: {
     type: Boolean,
     default: false
   }
@@ -76,10 +76,10 @@ const usersSchema = new Schema({
   config: {
     type: {configSchema},
     default: {
-      numbers: 20,
+      numbers: 20,//每组单词个数
       auto_audio: false,
       is_kk: false,
-      isHold: false
+      is_hold: false
     }
   },
   calendar:{

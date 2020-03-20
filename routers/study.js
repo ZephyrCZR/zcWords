@@ -34,7 +34,7 @@ router.get('/zrizc/study/addbook', (req, res) => {
 //上传词书数据
 router.post('/zrizc/study/upload', (req, res) => {
   const body = req.body
-
+  console.log(body);
   const uid = req.user.uid
   service_word.syncUsersBook(uid, body.book_info).then(() => {
     res.status(200).json({
@@ -51,7 +51,6 @@ router.post('/zrizc/study/upload', (req, res) => {
 
 //获取用户词书状态信息
 router.get('/zrizc/study/bookinfo', (req, res) => {
-
   const body = req.query
   console.log(body);
   service_word.getUsersBookByBId(body.book_id).then((book) => {
@@ -60,7 +59,17 @@ router.get('/zrizc/study/bookinfo', (req, res) => {
       err_code: 0
     })
   })
+})
 
+//获取单词信息
+router.post('/zrizc/study/getwords', (req, res) => {
+  const body = req.body
+  service_word.getWordsArrByIdArr(body).then((wordsInfoArr) => {
+    res.status(200).json({
+      wordsInfoArr,
+      err_code: 0
+    })
+  })
 
 })
 
