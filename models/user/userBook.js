@@ -16,10 +16,10 @@ const bookSchema = new Schema({
     default: -1
   }, 
   first_date: {
-    type: Date
+    type: String
   },
   next_date: {
-    type: Date
+    type: String
   }
 
 })
