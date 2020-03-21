@@ -48,8 +48,8 @@ app.use('/node_modules/', express.static(path.join(__dirname, './node_modules/')
 // app.set('views', path.join(__dirname, './views/'))//默认就是./views
 
 // 挂载post请求体插件，必须在app.use(router)之前
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({limit: '10mb', extended: false }))
+app.use(bodyParser.json({limit: '10mb'}))
 
 // 挂载路由
 app.use(study)

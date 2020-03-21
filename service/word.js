@@ -249,19 +249,18 @@ const setState = function (book_id, word_id, state) {
 // setState("5e6344aad7906a193432e27e", "5e58b377b197993f90e1e88a", 110)
 
 //同步单词状态表
-const syncUsersBook = function (book_id, wordsArr) {
+const syncUsersBook = function (book_info) {
   return new Promise((resolve) => {
-    const time = Data.now()
-    UserBook.findByIdAndUpdate(book_id, {
-      $set: {
-        book: wordsArr,
-        version: time
+    UserBook.findByIdAndUpdate(book_info._id, {
+      $set:{
+        book: book_info.book,
+        version: book_info.version
       }
     }).exec((err, doc) => {
       if (err) {
         console.log(err);
       } else {
-        resolve(doc)
+        resolve()
       }
     })
   })
@@ -289,14 +288,14 @@ const getUsersBookByBId = function (book_id) {
  * @param {单词Id数组} wordsIdArr 
  */
 
-const getWordsArrByIdArr = async function (wordsIdArr) {  
-    let wordsInfo = []
-    for (let i=0; i<wordsIdArr.length; ) {      
-        const el = wordsIdArr[i];
-        wordsInfo.push(await findWordById(el))
-        i++
-      }
-    return wordsInfo
+const getWordsArrByIdArr = async function (wordsIdArr) {
+  let wordsInfo = []
+  for (let i = 0; i < wordsIdArr.length;) {
+    const el = wordsIdArr[i];
+    wordsInfo.push(await findWordById(el))
+    i++
+  }
+  return wordsInfo
 }
 
 /**根据 wordId 从单词总库中查找一个单词
@@ -410,5 +409,6 @@ const findWordById = function (wordId) {
 module.exports = {
   addUserBook,
   getUsersBookByBId,
-  getWordsArrByIdArr
+  getWordsArrByIdArr,
+  syncUsersBook
 }

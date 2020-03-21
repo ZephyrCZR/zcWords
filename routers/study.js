@@ -33,10 +33,9 @@ router.get('/zrizc/study/addbook', (req, res) => {
 
 //上传词书数据
 router.post('/zrizc/study/upload', (req, res) => {
-  const body = req.body
-  console.log(body);
-  const uid = req.user.uid
-  service_word.syncUsersBook(uid, body.book_info).then(() => {
+  const book_info = req.body
+  console.log(book_info._id);
+  service_word.syncUsersBook(book_info).then(() => {
     res.status(200).json({
       message: '数据同步成功',
       err_code: 0
